@@ -14,6 +14,71 @@
             min-height: 100vh;
         }
 
+        /* ===== TELA DE ENTRADA ===== */
+        .welcome-screen {
+            position: fixed; inset: 0;
+            background: linear-gradient(135deg, #534AB7 0%, #3C3489 100%);
+            z-index: 300;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .welcome-screen.hidden { display: none; }
+
+        .welcome-box {
+            background: white;
+            border-radius: 18px;
+            padding: 40px 32px;
+            width: 100%; max-width: 420px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+            animation: fadeIn 0.4s;
+        }
+
+        .welcome-box .w-logo {
+            max-width: 110px; max-height: 90px;
+            object-fit: contain;
+            margin-bottom: 14px;
+        }
+        .welcome-box .w-icon { font-size: 50px; margin-bottom: 10px; }
+        .welcome-box h2 { color: #3C3489; font-size: 22px; margin-bottom: 4px; }
+        .welcome-box .w-sub { color: #888; font-size: 13px; margin-bottom: 28px; }
+
+        .welcome-buttons { display: flex; flex-direction: column; gap: 12px; }
+
+        .w-btn {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 18px;
+            border: 2px solid #e4e2f2;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-family: inherit;
+        }
+        .w-btn:hover { border-color: #534AB7; background: #FBFAFF; transform: translateY(-2px); }
+        .w-btn .w-btn-icon {
+            width: 46px; height: 46px; min-width: 46px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .w-btn.visitor .w-btn-icon { background: #EEEDFE; color: #534AB7; }
+        .w-btn.adm .w-btn-icon { background: #FFF3DC; color: #C98A00; }
+        .w-btn .w-btn-title { font-weight: 700; font-size: 15px; color: #333; }
+        .w-btn .w-btn-desc { font-size: 12px; color: #999; margin-top: 2px; }
+
+        .welcome-senha { display: none; margin-top: 20px; text-align: left; }
+        .welcome-senha.show { display: block; animation: fadeIn 0.3s; }
+        .welcome-senha .msg { margin-bottom: 12px; }
+        .w-voltar {
+            background: transparent; border: none;
+            color: #888; font-size: 13px;
+            cursor: pointer; margin-top: 14px;
+            font-family: inherit;
+        }
+        .w-voltar:hover { color: #534AB7; }
+
         .layout { display: flex; min-height: 100vh; }
 
         /* ===== SIDEBAR ===== */
@@ -364,6 +429,61 @@
         }
         .cal-event .del:hover { color: #d64545; }
 
+        .cal-event .swap {
+            position: absolute;
+            top: 2px; left: 4px;
+            background: transparent; border: none;
+            color: #b8aede; cursor: pointer;
+            font-size: 11px;
+            padding: 2px;
+        }
+        .cal-event .swap:hover { color: #534AB7; }
+
+        /* ===== MODAL DE TROCA ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(30, 25, 70, 0.55);
+            z-index: 200;
+            align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            width: 100%; max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.2s;
+        }
+        .modal h3 {
+            color: #3C3489; font-size: 18px;
+            margin-bottom: 4px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .modal .modal-sub { font-size: 13px; color: #888; margin-bottom: 18px; }
+
+        .troca-atual {
+            display: flex; align-items: center; gap: 12px;
+            background: #f8f7fd;
+            border: 1px solid #e9e7f5;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        .troca-atual .ta-info { font-size: 13px; }
+        .troca-atual .ta-nome { font-weight: 700; color: #3C3489; font-size: 14px; }
+        .troca-atual .ta-det { color: #888; }
+
+        .modal-buttons { display: flex; gap: 10px; margin-top: 18px; }
+        .modal-buttons .btn { flex: 1; justify-content: center; }
+        .btn-cancel {
+            background: #f0f0f0; color: #555;
+        }
+        .btn-cancel:hover { background: #e2e2e2; }
+
         .month-stats {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 12px; margin-bottom: 20px;
@@ -485,6 +605,49 @@
     </style>
 </head>
 <body>
+
+    <!-- ===== TELA DE ENTRADA ===== -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-box">
+            <img src="logo.png" alt="Logo IASD" class="w-logo"
+                 onerror="this.style.display='none'; document.getElementById('wIconFallback').style.display='block';">
+            <div class="w-icon" id="wIconFallback" style="display:none;">🎵</div>
+            <h2>Escala de Sonoplastia</h2>
+            <div class="w-sub">Igreja Adventista Liberdade</div>
+
+            <div class="welcome-buttons" id="welcomeButtons">
+                <button class="w-btn visitor" onclick="entrarVisitante()">
+                    <div class="w-btn-icon"><i class="fas fa-calendar-days"></i></div>
+                    <div>
+                        <div class="w-btn-title">Visualizar</div>
+                        <div class="w-btn-desc">Ver a escala e o ranking</div>
+                    </div>
+                </button>
+                <button class="w-btn adm" onclick="mostrarSenhaWelcome()">
+                    <div class="w-btn-icon"><i class="fas fa-user-shield"></i></div>
+                    <div>
+                        <div class="w-btn-title">Administrador</div>
+                        <div class="w-btn-desc">Montar escala, cadastrar e trocar</div>
+                    </div>
+                </button>
+            </div>
+
+            <div class="welcome-senha" id="welcomeSenha">
+                <div class="msg error" id="wLoginErro">Senha incorreta. Tente novamente.</div>
+                <div class="form-group">
+                    <label>Senha de administrador</label>
+                    <input type="password" id="wSenhaAdmin" placeholder="Digite a senha"
+                           onkeydown="if(event.key==='Enter')entrarAdminWelcome()">
+                </div>
+                <button class="btn btn-primary btn-block" onclick="entrarAdminWelcome()">
+                    <i class="fas fa-right-to-bracket"></i> Entrar como administrador
+                </button>
+                <button class="w-voltar" onclick="voltarWelcome()">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div class="mobile-topbar">
         <button onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
@@ -723,6 +886,28 @@
         </main>
     </div>
 
+    <!-- ===== MODAL DE TROCA ===== -->
+    <div class="modal-overlay" id="modalTroca" onclick="if(event.target===this)fecharTroca()">
+        <div class="modal">
+            <h3><i class="fas fa-right-left"></i> Trocar sonoplasta</h3>
+            <div class="modal-sub">A data e o tipo do evento serão mantidos</div>
+
+            <div class="troca-atual" id="trocaAtual"></div>
+
+            <div class="form-group">
+                <label>Novo sonoplasta</label>
+                <select id="selectTroca"></select>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn btn-cancel" onclick="fecharTroca()">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmarTroca()">
+                    <i class="fas fa-check"></i> Confirmar troca
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase (Versão Compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -860,6 +1045,49 @@
             preencherSelectSonoplastas();
         });
 
+        // ================== TELA DE ENTRADA ==================
+        function entrarVisitante() {
+            sessionStorage.setItem('sonoEntrou', '1');
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            irPara('ver');
+        }
+
+        function mostrarSenhaWelcome() {
+            document.getElementById('welcomeButtons').style.display = 'none';
+            document.getElementById('welcomeSenha').classList.add('show');
+            setTimeout(() => document.getElementById('wSenhaAdmin').focus(), 100);
+        }
+
+        function voltarWelcome() {
+            document.getElementById('welcomeSenha').classList.remove('show');
+            document.getElementById('wLoginErro').classList.remove('show');
+            document.getElementById('wSenhaAdmin').value = '';
+            document.getElementById('welcomeButtons').style.display = 'flex';
+        }
+
+        function entrarAdminWelcome() {
+            const senha = document.getElementById('wSenhaAdmin').value;
+            if (senha === SENHA_ADMIN) {
+                ehAdmin = true;
+                sessionStorage.setItem('sonoAdmin', '1');
+                sessionStorage.setItem('sonoEntrou', '1');
+                document.getElementById('wSenhaAdmin').value = '';
+                document.getElementById('wLoginErro').classList.remove('show');
+                document.getElementById('welcomeScreen').classList.add('hidden');
+                atualizarUIAdmin();
+                irPara('ver');
+            } else {
+                document.getElementById('wLoginErro').classList.add('show');
+            }
+        }
+
+        function verificarEntrada() {
+            // Se já entrou nesta sessão (como visitante ou admin), pula a tela de entrada
+            if (sessionStorage.getItem('sonoEntrou') === '1' || ehAdmin) {
+                document.getElementById('welcomeScreen').classList.add('hidden');
+            }
+        }
+
         // ================== NAVEGAÇÃO / ADMIN ==================
         function irPara(pagina) {
             const precisaAdmin = (pagina === 'montar' || pagina === 'sonoplastas');
@@ -904,8 +1132,12 @@
         function sairAdmin() {
             ehAdmin = false;
             sessionStorage.removeItem('sonoAdmin');
+            sessionStorage.removeItem('sonoEntrou');
             atualizarUIAdmin();
             irPara('ver');
+            // Volta para a tela de entrada
+            voltarWelcome();
+            document.getElementById('welcomeScreen').classList.remove('hidden');
         }
 
         function atualizarUIAdmin() {
@@ -1105,6 +1337,61 @@
             }
         }
 
+        // ================== TROCA DE SONOPLASTA ==================
+        let trocaEventoId = null;
+
+        function abrirTroca(id) {
+            const ev = escala[id];
+            if (!ev) return;
+            trocaEventoId = id;
+
+            const dt = new Date(ev.data + 'T00:00:00');
+            const dataFmt = nomesDiasCurto[dt.getDay()] + ', ' +
+                String(dt.getDate()).padStart(2,'0') + '/' + String(dt.getMonth()+1).padStart(2,'0') + '/' + dt.getFullYear();
+
+            document.getElementById('trocaAtual').innerHTML = `
+                ${avatarHtml(ev.sonoplasta)}
+                <div class="ta-info">
+                    <div class="ta-nome">${escapeHtml(ev.sonoplasta)}</div>
+                    <div class="ta-det">${dataFmt} • ${escapeHtml(ev.evento || 'Evento')}</div>
+                </div>
+            `;
+
+            // Preencher select sem o sonoplasta atual
+            const ids = Object.keys(sonoplastas);
+            const ordenados = ids.sort((a, b) => sonoplastas[a].nome.localeCompare(sonoplastas[b].nome, 'pt-BR'));
+            const opcoes = ordenados
+                .filter(sid => normalizarNome(sonoplastas[sid].nome) !== normalizarNome(ev.sonoplasta))
+                .map(sid => `<option value="${escapeHtml(sonoplastas[sid].nome)}">${escapeHtml(sonoplastas[sid].nome)}</option>`)
+                .join('');
+
+            document.getElementById('selectTroca').innerHTML =
+                '<option value="">Selecione...</option>' + opcoes;
+
+            document.getElementById('modalTroca').classList.add('show');
+        }
+
+        function fecharTroca() {
+            trocaEventoId = null;
+            document.getElementById('modalTroca').classList.remove('show');
+        }
+
+        function confirmarTroca() {
+            const novoNome = document.getElementById('selectTroca').value;
+            if (!novoNome) { alert('Selecione o novo sonoplasta!'); return; }
+            if (!trocaEventoId || !escala[trocaEventoId]) { fecharTroca(); return; }
+
+            const antigo = escala[trocaEventoId].sonoplasta;
+
+            escalaRef.child(trocaEventoId).update({
+                sonoplasta: novoNome,
+                trocaDe: antigo,
+                trocaEm: new Date().toISOString()
+            }).then(() => {
+                fecharTroca();
+            }).catch(err => alert('Erro ao trocar: ' + err.message));
+        }
+
         // ================== CALENDÁRIO EM GRADE ==================
         function montarFiltros() {
             const selMes = document.getElementById('filtroMes');
@@ -1173,7 +1460,10 @@
 
                     const eventosHtml = eventos.map(ev => `
                         <div class="cal-event">
-                            ${ehAdmin ? `<button class="del" title="Remover" onclick="removerEvento('${ev.id}')"><i class="fas fa-times"></i></button>` : ''}
+                            ${ehAdmin ? `
+                                <button class="del" title="Remover" onclick="removerEvento('${ev.id}')"><i class="fas fa-times"></i></button>
+                                <button class="swap" title="Trocar sonoplasta" onclick="abrirTroca('${ev.id}')"><i class="fas fa-right-left"></i></button>
+                            ` : ''}
                             <div class="foto-wrap">${avatarHtml(ev.sonoplasta)}</div>
                             <div class="ev-nome">${escapeHtml(ev.sonoplasta)}</div>
                             <div class="ev-tipo">${escapeHtml(ev.evento || 'Evento')}</div>
@@ -1310,6 +1600,7 @@
         renderizarMes();
         atualizarUIAdmin();
         carregarFotos();
+        verificarEntrada();
 
         const hj = new Date();
         document.getElementById('dataEscala').value =
