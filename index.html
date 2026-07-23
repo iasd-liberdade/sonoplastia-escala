@@ -36,6 +36,16 @@
         }
 
         .sidebar-header .icon { font-size: 36px; margin-bottom: 8px; }
+
+        .logo-img {
+            max-width: 140px;
+            max-height: 80px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 10px;
+            padding: 8px;
+        }
         .sidebar-header h1 { font-size: 18px; font-weight: 700; }
         .sidebar-header p { font-size: 12px; opacity: 0.8; margin-top: 4px; }
 
@@ -401,7 +411,8 @@
 
     <div class="mobile-topbar">
         <button onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-        <span>🎵 Escala de Sonoplastia</span>
+        <img src="logo.png" alt="" style="height:28px; background:white; border-radius:6px; padding:3px;" onerror="this.style.display='none';">
+        <span>Escala de Sonoplastia</span>
     </div>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
@@ -409,7 +420,9 @@
         <!-- ===== SIDEBAR ===== -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="icon">🎵</div>
+                <img src="logo.png" alt="Logo IASD" class="logo-img" id="logoImg"
+                     onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';">
+                <div class="icon" id="logoFallback" style="display:none;">🎵</div>
                 <h1>Escala de Sonoplastia</h1>
                 <p>Igreja Adventista Liberdade</p>
                 <div class="sync-status" id="syncStatus">
